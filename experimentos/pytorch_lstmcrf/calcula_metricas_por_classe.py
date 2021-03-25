@@ -93,8 +93,9 @@ for i in range(len(lines_resultados)):
 			mi[1][0] += 1
 
 #MICRO AVERAGE PARA CADA CLASSE
-for classe in mapp:
-	
+precisao_media,recall_medio,f_measure_media = 0,0,0
+for cont,classe in enumerate(mapp):
+
 	if classe != 'ABSTRACAO':
 
 		print('classe: '+ classe)
@@ -106,8 +107,20 @@ for classe in mapp:
 		precisao = MC[0][0]/(MC[0][0]+MC[0][1])
 		recall = MC[1][1]/(MC[1][1]+MC[1][0])
 		f_measure = (2*precisao*recall)/(precisao+recall)
+
+		precisao_media += precisao
+		recall_medio += recall
+		f_measure_media += f_measure
 	
 		print('precisao: ' + str(round(precisao,2)))
 		print('recall: ' + str(round(recall,2)))
 		print('f-measure: ' + str(round(f_measure,2)))
 		print()
+
+pm = round(precisao_media/(cont+1),2)
+rm = round(recall_medio/(cont+1),2)
+fm = round(f_measure_media/(cont+1),2)
+
+print('Precisao Total: '+str(pm)) 
+print('Recall Total: '+str(rm))
+print('f_measure Total: '+str(fm)) 
