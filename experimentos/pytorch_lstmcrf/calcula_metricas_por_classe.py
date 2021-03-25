@@ -8,13 +8,21 @@ def read_file(file):
 			l.append(line)
 	return l
 
+#matriz de confusao pra cada classe
 def init_mapp(classe,mapp):
 	mapp[classe] = {
-		'Acertos':[0,0,0],
-		'Total':0,
-		'FN':[0,0,0]	
+		'B':[[0,0],[0,0]],
+		'I':[[0,0],[0,0]],
+		'O':[[0,0],[0,0]]
 	}
-
+	
+def sum_matrix(m1,m2):
+	n = len(m1[0])
+	m3 = [[0,0],[0,0]]
+	for i in range(n):
+		for j in range(n):
+			m3[i][j] = m1[i][j] + m2[i][j]
+	return m3
 
 f_resultados = open('data/harem_seg/results_harem_100.txt','r')
 f_classes = open('data/harem_seg/test_com_classes.txt')
@@ -47,32 +55,59 @@ for i in range(len(lines_resultados)):
 	if classe_atual not in mapp:
 		init_mapp(classe_atual,mapp)
 
-	mapp[classe_atual]['Total'] += 1
+	mb = mapp[classe_atual]['B']
+	mi = mapp[classe_atual]['I']
+	mo = mapp[classe_atual]['O']
 
-	if tag_result == tag_teste:
-		if tag_teste == 'B':
-			mapp[classe_atual]['Acertos'][0] += 1
-		elif tag_teste == 'I':
-			mapp[classe_atual]['Acertos'][1] += 1
-		elif tag_teste == 'O':
-			mapp[classe_atual]['Acertos'][2] += 1
-	else:
+	if tag_teste == tag_result:
 		if tag_result == 'B':
-			mapp[classe_atual]['FN'][0] += 1
+			mb[0][0] += 1
+			mi[1][1] += 1
+			mo[1][1] += 1
 		elif tag_result == 'I':
-			mapp[classe_atual]['FN'][1] += 1
+			mi[0][0] += 1
+			mb[1][1] += 1
+			mo[1][1] += 1
 		elif tag_result == 'O':
-			mapp[classe_atual]['FN'][2] += 1
+			mo[0][0] += 1
+			mb[1][1] += 1
+			mi[1][1] += 1
+	else:
+		if tag_result == 'B' and tag_teste == 'I':
+			mb[0][1] += 1
+			mi[1][0] += 1
+		elif tag_result == 'B' and tag_teste == 'O':
+			mb[0][1] += 1
+			mo[1][0] += 1
+		elif tag_result == 'I' and tag_teste == 'B':
+			mi[0][1] += 1
+			mb[1][0] += 1
+		elif tag_result == 'I' and tag_teste == 'O':
+			mi[0][1] += 1
+			mo[1][0] += 1
+		elif tag_result == 'O' and tag_teste == 'B':
+			mo[0][1] += 1
+			mb[1][0] += 1
+		elif tag_result == 'O' and tag_teste == 'I':
+			mo[0][1] += 1
+			mi[1][0] += 1
 
+#MICRO AVERAGE PARA CADA CLASSE
 for classe in mapp:
-	print('classe: '+ classe)
-	total = mapp[classe]['Total']
-	total_acertos = sum(mapp[classe]['Acertos'])
-	precisao = total_acertos/total
-	total_fn = sum(mapp[classe]['FN'])
-	recall = total_acertos/(total_acertos+total_fn)
-	f_measure = (2*precisao*recall)/(precisao+recall)
-	print('precisao: ' + str(round(precisao,2)))
-	print('recall: ' + str(round(recall,2)))
-	print('f-measure: ' + str(round(f_measure,2)))
-	print()
+	
+	if classe != 'ABSTRACAO':
+
+		print('classe: '+ classe)
+
+		matrizes = mapp[classe]
+		m_aux = sum_matrix(matrizes['B'],matrizes['I'])
+		MC = sum_matrix(m_aux,matrizes['O'])
+
+		precisao = MC[0][0]/(MC[0][0]+MC[0][1])
+		recall = MC[1][1]/(MC[1][1]+MC[1][0])
+		f_measure = (2*precisao*recall)/(precisao+recall)
+	
+		print('precisao: ' + str(round(precisao,2)))
+		print('recall: ' + str(round(recall,2)))
+		print('f-measure: ' + str(round(f_measure,2)))
+		print()
