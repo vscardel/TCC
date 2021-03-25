@@ -1,6 +1,8 @@
 #esse script recebe como entrada dois arquivos: O arquivo dos resultados
 #e o arquivo de teste com as classes (nao apenas segmentando as entidades)
 
+import sys
+
 def read_file(file):
 	l = []
 	for line in file.readlines():
@@ -13,9 +15,10 @@ def init_mapp(classe,mapp):
 	mapp[classe] = {
 		'B':[[0,0],[0,0]],
 		'I':[[0,0],[0,0]],
-		'O':[[0,0],[0,0]]
+		'O':[[0,0],[0,0]],
+		'size':0
 	}
-	
+
 def sum_matrix(m1,m2):
 	n = len(m1[0])
 	m3 = [[0,0],[0,0]]
@@ -24,8 +27,17 @@ def sum_matrix(m1,m2):
 			m3[i][j] = m1[i][j] + m2[i][j]
 	return m3
 
-f_resultados = open('data/harem_seg/results_harem_100.txt','r')
-f_classes = open('data/harem_seg/test_com_classes.txt')
+name_f1 = sys.argv[1]
+name_f2 = sys.argv[2]
+peso_por_tamanho = True
+
+if name_f1 and name_f2:
+	try:
+		f_resultados = open(name_f1,'r')
+		f_classes = open(name_f2,'r')
+	except:
+		print('entrada inválida')
+		sys.exit()
 
 lines_resultados = read_file(f_resultados)
 lines_classes = read_file(f_classes)
@@ -54,6 +66,8 @@ for i in range(len(lines_resultados)):
 
 	if classe_atual not in mapp:
 		init_mapp(classe_atual,mapp)
+	else:
+		mapp[classe_atual]['size'] += 1
 
 	mb = mapp[classe_atual]['B']
 	mi = mapp[classe_atual]['I']
@@ -92,6 +106,10 @@ for i in range(len(lines_resultados)):
 			mo[0][1] += 1
 			mi[1][0] += 1
 
+#para o caso do peso por tamanho da classe
+sizes_all_classes = [mapp[classe]['size'] for classe in mapp]
+total_size = sum(sizes_all_classes)
+
 #MICRO AVERAGE PARA CADA CLASSE
 precisao_media,recall_medio,f_measure_media = 0,0,0
 for cont,classe in enumerate(mapp):
@@ -111,7 +129,7 @@ for cont,classe in enumerate(mapp):
 		precisao_media += precisao
 		recall_medio += recall
 		f_measure_media += f_measure
-	
+		
 		print('precisao: ' + str(round(precisao,2)))
 		print('recall: ' + str(round(recall,2)))
 		print('f-measure: ' + str(round(f_measure,2)))
@@ -120,6 +138,7 @@ for cont,classe in enumerate(mapp):
 pm = round(precisao_media/(cont+1),2)
 rm = round(recall_medio/(cont+1),2)
 fm = round(f_measure_media/(cont+1),2)
+
 
 print('Precisao Total: '+str(pm)) 
 print('Recall Total: '+str(rm))
