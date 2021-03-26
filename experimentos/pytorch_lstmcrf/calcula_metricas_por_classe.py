@@ -42,6 +42,11 @@ if name_f1 and name_f2:
 lines_resultados = read_file(f_resultados)
 lines_classes = read_file(f_classes)
 
+print()
+print('Linhas de cada Dataset')
+print(len(lines_resultados),len(lines_classes))
+print()
+
 mapp = {}
 
 for i in range(len(lines_resultados)):
@@ -112,6 +117,7 @@ total_size = sum(sizes_all_classes)
 
 #MICRO AVERAGE PARA CADA CLASSE
 precisao_media,recall_medio,f_measure_media = 0,0,0
+
 for cont,classe in enumerate(mapp):
 
 	if classe != 'ABSTRACAO':
