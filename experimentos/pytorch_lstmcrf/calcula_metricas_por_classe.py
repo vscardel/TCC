@@ -139,7 +139,6 @@ pm = round(precisao_media/(cont+1),2)
 rm = round(recall_medio/(cont+1),2)
 fm = round(f_measure_media/(cont+1),2)
 
-
 print('Precisao Total: '+str(pm)) 
 print('Recall Total: '+str(rm))
 print('f_measure Total: '+str(fm)) 
